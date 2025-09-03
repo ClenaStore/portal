@@ -4,162 +4,102 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Painel • Mini Site do Amor (Drive + Sheets)</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
     :root{--bg:#0c0a13; --ink:#fff; --muted:#cfcada; --line:#2b2a3f; --card:#181827; --a:#ff77a9; --b:#9b87ff; --shadow:0 12px 30px rgba(0,0,0,.35), 0 8px 24px rgba(155,135,255,.18)}
     *{box-sizing:border-box}
-    body{margin:0;background:radial-gradient(1200px 560px at 12% -10%, rgba(155,135,255,.16), transparent 60%), radial-gradient(900px 420px at 110% 10%, rgba(255,119,169,.12), transparent 60%), linear-gradient(#0b0a13,#0f0d19); color:var(--ink); font-family:Inter,system-ui,Arial,sans-serif}
+    body{margin:0;background:linear-gradient(#0b0a13,#0f0d19); color:var(--ink); font-family:Inter,system-ui,Arial,sans-serif}
     .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(14px,3vw,24px)}
-    header{position:sticky;top:0;z-index:30;background:linear-gradient(180deg,rgba(12,10,19,.9),rgba(12,10,19,.6)); backdrop-filter:saturate(160%) blur(8px); border-bottom:1px solid rgba(255,255,255,.06)}
-    .head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0}
+    header{position:sticky;top:0;z-index:30;background:rgba(12,10,19,.9);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.06)}
+    .head{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
     .brand{display:flex;align-items:center;gap:10px}
-    .badge{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--b),var(--a));display:grid;place-items:center;box-shadow:var(--shadow)}
-    h1{margin:0;font-size:clamp(16px,2.2vw,20px)}
+    .badge{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--b),var(--a));display:grid;place-items:center}
+    h1{margin:0;font-size:18px}
 
-    main{position:relative}
-    .grid{display:grid;grid-template-columns:1.05fr .95fr;gap:18px;padding:18px 0}
-    @media (max-width:980px){.grid{grid-template-columns:1fr}}
+    main{padding:20px 0}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    @media(max-width:980px){.grid{grid-template-columns:1fr}}
 
-    .panel{background:linear-gradient(180deg,#1a1a2b,#151525); border:1px solid var(--line); border-radius:18px; box-shadow:var(--shadow); overflow:hidden}
-    .panel header{padding:12px 14px;border-bottom:1px solid var(--line);font-weight:800}
+    .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+    .panel header{padding:12px;border-bottom:1px solid var(--line);font-weight:800}
     .panel .bd{padding:14px}
-
-    label{font-size:13px;color:#eae6ff}
-    input[type=text], input[type=url], textarea{width:100%; background:#1a1a2a; color:#fff; border:1px solid #32304a; border-radius:10px; padding:10px 12px}
-    textarea{min-height:110px; resize:vertical}
-    input[type=file]{width:100%}
     .rows{display:grid;gap:12px}
-    .row-h{display:grid;grid-template-columns:1fr 1fr; gap:10px}
-    @media (max-width:700px){.row-h{grid-template-columns:1fr}}
-    .small{font-size:12px;color:var(--muted)}
+    input,textarea{width:100%;background:#1a1a2a;color:#fff;border:1px solid #32304a;border-radius:10px;padding:10px}
+    textarea{min-height:100px}
+    .thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+    .card{position:relative;border:1px solid #2f2e46;border-radius:12px;overflow:hidden}
+    .card img{width:100%;height:100px;object-fit:cover}
+    .card button{position:absolute;top:6px;right:6px;background:#ff4d6d;border:0;color:#fff;border-radius:50%;width:22px;height:22px;cursor:pointer}
 
-    .thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
-    .card{position:relative;background:#121222;border:1px solid #2f2e46;border-radius:14px;overflow:hidden}
-    .card img{width:100%;height:110px;object-fit:cover;display:block}
-    .card .del{position:absolute;top:6px;right:6px;background:#ff4d6d;border:0;color:#fff;width:24px;height:24px;border-radius:999px;cursor:pointer}
+    .btn{padding:10px 14px;border:0;border-radius:12px;font-weight:700;cursor:pointer;color:#fff;background:#27263c}
+    .btn-primary{background:linear-gradient(135deg,var(--b),var(--a))}
+    .actions{display:flex;gap:10px;flex-wrap:wrap}
 
-    .btn{border:0;border-radius:12px;padding:10px 14px;font-weight:800;cursor:pointer;color:#fff;background:#27263c}
-    .btn-primary{background:linear-gradient(135deg,var(--b),var(--a));box-shadow:var(--shadow)}
-    .actions{display:flex;flex-wrap:wrap;gap:10px}
-
-    /* Preview phone */
-    .phone{position:relative;width:300px;max-width:90vw;aspect-ratio:9/18;border-radius:28px;background:linear-gradient(160deg,#2a2838,#171625);border:1px solid rgba(255,255,255,.08);box-shadow:0 30px 60px rgba(0,0,0,.42);overflow:hidden;margin:0 auto}
-    .notch{position:absolute;top:6px;left:50%;transform:translateX(-50%);width:110px;height:18px;background:#0f0e18;border-radius:0 0 12px 12px;border:1px solid rgba(255,255,255,.08)}
-    .screen{position:absolute;inset:10px;border-radius:22px;background:linear-gradient(180deg,#0d0c18,#141328);overflow:auto}
-
-    .title{font-weight:800;font-size:20px;text-align:center;margin:18px 8px 10px;background:linear-gradient(90deg,var(--b),var(--a));-webkit-background-clip:text;background-clip:text;color:transparent}
-    .frame{width:92%;margin:10px auto 6px;padding:12px;border-radius:22px;background:linear-gradient(#111,#111) padding-box, conic-gradient(from 120deg,var(--a),var(--b),var(--a)) border-box;border:3px solid transparent;box-shadow:0 12px 26px rgba(0,0,0,.45), 0 0 24px rgba(255,119,169,.12);position:relative;overflow:hidden}
-    .viewport{position:relative;width:100%;aspect-ratio:4/5;border-radius:16px;overflow:hidden;background:radial-gradient(120% 100% at 50% 0,#171626 0%,#0f0e18 60%)}
-    .slide{position:absolute;inset:0;opacity:0;transition:opacity .5s ease}
+    .phone{position:relative;width:280px;aspect-ratio:9/18;margin:auto;border-radius:22px;background:#111;border:1px solid #333;overflow:hidden}
+    .screen{padding:12px}
+    .title{font-weight:800;font-size:20px;text-align:center;margin-bottom:10px;background:linear-gradient(90deg,var(--b),var(--a));-webkit-background-clip:text;color:transparent}
+    .viewport{position:relative;aspect-ratio:4/5;border-radius:14px;overflow:hidden;background:#222}
+    .slide{position:absolute;inset:0;opacity:0;transition:opacity .5s}
     .slide.show{opacity:1}
-    .slide img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1.07) contrast(1.03)}
-    .slide.enter img{-webkit-mask-image:var(--heart-url);mask-image:var(--heart-url);-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center;-webkit-mask-size:0% 0%;mask-size:0% 0%;animation:heartOpen 1100ms ease forwards}
-    @keyframes heartOpen{0%{-webkit-mask-size:0% 0%;mask-size:0% 0%;opacity:.6}65%{-webkit-mask-size:140% 140%;mask-size:140% 140%}100%{-webkit-mask-size:200% 200%;mask-size:200% 200%;opacity:1}}
+    .slide img{width:100%;height:100%;object-fit:cover}
+    .section{margin-top:12px}
+    .ytbox iframe{width:100%;height:180px;border:0;border-radius:12px}
 
-    .section{padding:10px 12px 16px}
-    .section h3{margin:8px 0 8px;font-size:14px}
-    .section p{margin:0 2px 6px;color:#e7e2f9;opacity:.92;line-height:1.6;font-size:13px}
-    .ytbox{padding:0 8px 12px}
-    .ytbox iframe{width:100%;height:170px;border:0;border-radius:12px}
+    .log{margin-top:10px;padding:10px;font-size:12px;background:#121224;border:1px solid #2f2e46;border-radius:12px;color:#bbb}
 
-    #hearts{position:fixed;inset:0;z-index:999;pointer-events:auto}
-    .heart{position:fixed;top:-10vh;font-size:var(--sz,18px);cursor:pointer;transform:translateY(-10vh) rotate(0);filter:drop-shadow(0 8px 12px rgba(255,77,109,.25));animation:fall var(--du,9s) linear forwards, sway var(--du,9s) ease-in-out infinite;opacity:.95}
-    @keyframes fall{to{transform:translateY(110vh) rotate(360deg);opacity:0}} @keyframes sway{0%,100%{margin-left:-10px}50%{margin-left:10px}}
-    .boom{position:fixed;left:0;top:0;width:0;height:0;pointer-events:none;z-index:1000}
-    .spark{position:absolute;opacity:0;font-size:var(--sz,16px);transform:translate(0,0) scale(.6) rotate(0);animation:spark 700ms ease-out forwards}
-    @keyframes spark{0%{opacity:0;transform:translate(0,0) scale(.6) rotate(0)}20%{opacity:1}100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(1.2) rotate(var(--rot))}}
-    .ring{position:absolute;width:8px;height:8px;border:2px solid rgba(255,119,169,.85);border-radius:999px;opacity:0;animation:ring 600ms ease-out forwards}
-    @keyframes ring{0%{opacity:.9;transform:scale(.2)}100%{opacity:0;transform:scale(6)}}
-
-    .log{margin-top:10px;font-size:12px;color:#bdb7cc;white-space:pre-wrap;background:#121224;border:1px solid #2f2e46;border-radius:12px;padding:10px}
+    #hearts{position:fixed;inset:0;pointer-events:auto}
+    .heart{position:fixed;top:-10vh;font-size:18px;cursor:pointer;animation:fall 9s linear forwards,sway 9s ease-in-out infinite}
+    @keyframes fall{to{transform:translateY(110vh);opacity:0}}
+    @keyframes sway{0%,100%{margin-left:-10px}50%{margin-left:10px}}
+    .boom{position:fixed;left:0;top:0}
+    .spark{position:absolute;opacity:0;animation:spark 700ms ease-out forwards}
+    @keyframes spark{20%{opacity:1}100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(1.2)}}
+    .ring{position:absolute;width:8px;height:8px;border:2px solid pink;border-radius:50%;opacity:0;animation:ring 600ms ease-out forwards}
+    @keyframes ring{0%{opacity:1;transform:scale(.2)}100%{opacity:0;transform:scale(6)}}
   </style>
 </head>
 <body>
   <div id="hearts"></div>
   <header>
     <div class="wrap head">
-      <div class="brand"><div class="badge">💜</div><h1>Painel • Mini Site do Amor (Drive + Sheets)</h1></div>
+      <div class="brand"><div class="badge">💜</div><h1>Painel • Mini Site do Amor</h1></div>
       <div class="actions">
         <button class="btn" id="btnSign">Entrar com Google</button>
-        <button class="btn btn-primary" id="btnSaveAll" disabled>Salvar no Drive + Planilha</button>
-        <button class="btn" id="btnDownload">Baixar Mini Site (.html)</button>
+        <button class="btn btn-primary" id="btnSaveAll" disabled>Salvar no Drive + Sheets</button>
+        <button class="btn" id="btnDownload">Baixar HTML</button>
       </div>
     </div>
   </header>
 
-  <main class="wrap">
-    <div class="grid">
-      <div class="panel">
-        <header>Configurações</header>
-        <div class="bd rows">
-          <div class="row-h">
-            <div>
-              <label>Nome(s) / Título</label>
-              <input id="titleInput" type="text" placeholder="Ex.: Patrícia e Sérgio">
-            </div>
-            <div>
-              <label>Link do YouTube</label>
-              <input id="ytInput" type="url" placeholder="https://youtu.be/ID ou https://www.youtube.com/watch?v=ID">
-            </div>
-          </div>
-          <div>
-            <label>Mensagem</label>
-            <textarea id="msgInput" placeholder="Escreva uma mensagem romântica..."></textarea>
-          </div>
-          <div>
-            <label>Fotos (3 recomendadas)</label>
-            <input id="filesInput" type="file" accept="image/*" multiple>
-            <div id="thumbs" class="thumbs"></div>
-            <div class="small">Dica: arraste para selecionar 3 fotos. Você pode remover clicando em ✕ no card.</div>
-          </div>
-
-          <details class="u-google" style="background:#121224;border:1px solid #2f2e46;border-radius:12px;padding:10px">
-            <summary style="cursor:pointer;font-weight:800">⚙️ Configuração do Google (Drive + Sheets)</summary>
-            <div class="rows" style="margin-top:10px">
-              <div class="row-h">
-                <div>
-                  <label>Google API Key</label>
-                  <input id="gApiKey" type="text" placeholder="AIza...">
-                </div>
-                <div>
-                  <label>Google OAuth Client ID</label>
-                  <input id="gClientId" type="text" placeholder="1234567890-xxxxx.apps.googleusercontent.com">
-                </div>
-              </div>
-              <div>
-                <label>ID da Planilha (Sheets)</label>
-                <input id="sheetId" type="text" placeholder="1AbCdEfGhIjKlMn...">
-              </div>
-              <div class="small">Crie uma planilha com cabeçalhos (Timestamp, Título, Mensagem, YouTube, PastaDrive, HTMLLink, Foto1, Foto2, Foto3...). Os campos acima ficam gravados no seu navegador.</div>
-              <div class="actions"><button class="btn" id="btnSaveCfg">Salvar Configuração</button></div>
-            </div>
-          </details>
-
-          <div class="log" id="log">Pronto para criar ✨</div>
-        </div>
+  <main class="wrap grid">
+    <div class="panel">
+      <header>Configuração</header>
+      <div class="bd rows">
+        <input id="titleInput" type="text" placeholder="Nomes / Título">
+        <textarea id="msgInput" placeholder="Mensagem romântica..."></textarea>
+        <input id="ytInput" type="url" placeholder="Link do YouTube">
+        <input id="filesInput" type="file" accept="image/*" multiple>
+        <div id="thumbs" class="thumbs"></div>
+        <details>
+          <summary>⚙️ Configuração Google</summary>
+          <input id="gApiKey" placeholder="API Key">
+          <input id="gClientId" placeholder="Client ID">
+          <input id="sheetId" placeholder="ID da Planilha">
+          <button class="btn" id="btnSaveCfg">Salvar Configuração</button>
+        </details>
+        <div class="log" id="log">Pronto para criar ✨</div>
       </div>
+    </div>
 
-      <div class="panel">
-        <header>Prévia do mini site</header>
-        <div class="bd">
-          <div class="phone">
-            <div class="notch" aria-hidden="true"></div>
-            <div class="screen">
-              <div class="title" id="title">Seu título aqui</div>
-              <div class="frame">
-                <div class="viewport" id="viewport"></div>
-              </div>
-              <div class="section">
-                <h3>Nossa mensagem:</h3>
-                <p id="msgOut">Escreva sua mensagem no painel e veja aqui.</p>
-              </div>
-              <div class="section">
-                <h3>Nossa Música:</h3>
-                <div class="ytbox"><iframe id="ytFrame" allow="autoplay; encrypted-media" allowfullscreen></iframe></div>
-              </div>
-            </div>
+    <div class="panel">
+      <header>Prévia</header>
+      <div class="bd">
+        <div class="phone">
+          <div class="screen">
+            <div class="title" id="title">Seu título</div>
+            <div class="viewport" id="viewport"></div>
+            <div class="section"><h3>Nossa mensagem:</h3><p id="msgOut"></p></div>
+            <div class="section"><h3>Nossa Música:</h3><div class="ytbox"><iframe id="ytFrame"></iframe></div></div>
           </div>
         </div>
       </div>
@@ -168,128 +108,39 @@
 
   <script src="https://apis.google.com/js/api.js"></script>
   <script>
-    // ====== Estado e utilitários ======
-    const $ = (s,c=document)=>c.querySelector(s); const $$ = (s,c=document)=>[...c.querySelectorAll(s)];
-    const titleInput=$('#titleInput'), ytInput=$('#ytInput'), msgInput=$('#msgInput'), filesInput=$('#filesInput');
-    const titleEl=$('#title'), msgOut=$('#msgOut'), viewport=$('#viewport'), ytFrame=$('#ytFrame');
-    const thumbs=$('#thumbs'), logEl=$('#log');
+    const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+    const titleInput=$('#titleInput'),msgInput=$('#msgInput'),ytInput=$('#ytInput'),filesInput=$('#filesInput');
+    const titleEl=$('#title'),msgOut=$('#msgOut'),viewport=$('#viewport'),ytFrame=$('#ytFrame'),thumbs=$('#thumbs'),logEl=$('#log');
+    const state={title:'',msg:'',yt:'',photos:[]};
 
-    const state={ title:'', msg:'', yt:'', photos:[] };
-    const heartURL="url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><path fill=\"white\" d=\"M50 86 L16 52 A20 20 0 1 1 50 28 A20 20 0 1 1 84 52 Z\"/></svg>')";
+    const fileToDataURL=f=>new Promise(r=>{const rd=new FileReader();rd.onload=()=>r({name:f.name,type:f.type,dataURL:rd.result});rd.readAsDataURL(f);});
+    const ytId=u=>{try{const x=new URL(u);if(x.hostname.includes('youtu.be'))return x.pathname.slice(1);return x.searchParams.get('v');}catch{return ''}};
 
-    function esc(s=''){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-    const videoIdFromYouTube=url=>{try{const u=new URL(url); if(u.hostname.includes('youtu.be')) return u.pathname.slice(1); if(u.searchParams.get('v')) return u.searchParams.get('v'); const m=url.match(/embed\/([\w-]{6,})/); return m?m[1]:'';}catch{return ''}};
-    const fileToDataURL=file=>new Promise(res=>{const r=new FileReader(); r.onload=()=>res({name:file.name,type:file.type,dataURL:r.result}); r.readAsDataURL(file);});
+    titleInput.oninput=()=>{state.title=titleInput.value;titleEl.textContent=state.title;};
+    msgInput.oninput=()=>{state.msg=msgInput.value;msgOut.textContent=state.msg;};
+    ytInput.oninput=()=>{state.yt=ytInput.value;const id=ytId(state.yt);ytFrame.src=id?`https://www.youtube.com/embed/${id}?autoplay=1&mute=1&loop=1&playlist=${id}`:'';};
 
-    // ====== Renderização da prévia ======
-    titleInput.addEventListener('input',()=>{ state.title=titleInput.value.trim(); titleEl.textContent=state.title||'Seu título aqui'; });
-    msgInput.addEventListener('input',()=>{ state.msg=msgInput.value; msgOut.textContent=state.msg||'Escreva sua mensagem no painel e veja aqui.'; });
-    ytInput.addEventListener('input',()=>{ state.yt=ytInput.value.trim(); const id=videoIdFromYouTube(state.yt); ytFrame.src = id?`https://www.youtube.com/embed/${id}?autoplay=1&mute=1&playsinline=1&loop=1&playlist=${id}`:''; });
+    filesInput.onchange=async()=>{for(const f of filesInput.files)state.photos.push(await fileToDataURL(f));filesInput.value='';renderPhotos();};
 
-    filesInput.addEventListener('change', async ()=>{ const arr=[...filesInput.files].slice(0,12); for(const f of arr){ state.photos.push(await fileToDataURL(f)); } filesInput.value=''; drawThumbs(); drawSlides(); });
+    function renderPhotos(){thumbs.innerHTML='';viewport.innerHTML='';state.photos.forEach((p,i)=>{const c=document.createElement('div');c.className='card';c.innerHTML=`<img src='${p.dataURL}'><button data-i='${i}'>✕</button>`;thumbs.appendChild(c);c.querySelector('button').onclick=()=>{state.photos.splice(i,1);renderPhotos();};const s=document.createElement('div');s.className='slide'+(i===0?' show':'');s.innerHTML=`<img src='${p.dataURL}'>`;viewport.appendChild(s);});}
 
-    function drawThumbs(){ thumbs.innerHTML=''; state.photos.forEach((p,i)=>{ const card=document.createElement('div'); card.className='card'; card.innerHTML=`<img src='${p.dataURL}' alt='foto'><button class='del' data-i='${i}'>✕</button>`; thumbs.appendChild(card); }); $$('button.del',thumbs).forEach(b=>b.onclick=()=>{ state.photos.splice(+b.dataset.i,1); drawThumbs(); drawSlides(); }); }
+    setInterval(()=>{const slides=$$('.slide');if(slides.length<2)return;let i=slides.findIndex(s=>s.classList.contains('show'));slides[i].classList.remove('show');slides[(i+1)%slides.length].classList.add('show');},5000);
 
-    function drawSlides(){ viewport.innerHTML=''; if(state.photos.length===0){ viewport.innerHTML=`<div style="display:grid;place-items:center;color:#bfb9d1;font-size:12px">Adicione fotos para ver a prévia</div>`; return; } state.photos.forEach((p,i)=>{ const s=document.createElement('div'); s.className='slide'+(i===0?' show':''); s.innerHTML=`<img src='${p.dataURL}' alt='foto'>`; viewport.appendChild(s); }); }
+    function log(m){logEl.textContent=m;}
 
-    // Auto rotação com abertura de coração
-    setInterval(()=>{ const slides=$$('.slide', viewport); if(slides.length<2) return; const cur=slides.find(el=>el.classList.contains('show')) || slides[0]; let i=[...slides].indexOf(cur); cur.classList.remove('show'); const nxt=slides[(i+1)%slides.length]; nxt.classList.add('show','enter'); nxt.querySelector('img').style.webkitMaskImage=heartURL; nxt.querySelector('img').style.maskImage=heartURL; setTimeout(()=>nxt.classList.remove('enter'),1200); }, 5200);
+    // Download HTML
+    $('#btnDownload').onclick=()=>{const html=`<html><body><h1>${state.title}</h1><p>${state.msg}</p></body></html>`;const blob=new Blob([html],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='mini-site.html';a.click();};
 
-    // ====== Geração do HTML final ======
-    function generateSiteHTML(){
-      const id=videoIdFromYouTube(state.yt);
-      const slides = state.photos.map((p,i)=>`<div class='slide${i===0?" show":""}'><img src='${p.dataURL}' alt='foto'></div>`).join('');
-      return `<!doctype html><html lang='pt-BR'><head><meta charset='utf-8'/><meta name='viewport' content='width=device-width, initial-scale=1'/><title>${esc(state.title||'Nosso Amor')}</title><link href='https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap' rel='stylesheet'><style>:root{--bg:#0c0a13;--ink:#fff;--muted:#d7d3e3;--a:#ff77a9;--b:#9b87ff;--heart-url:url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><path fill=\'white\' d=\'M50 86 L16 52 A20 20 0 1 1 50 28 A20 20 0 1 1 84 52 Z\'/></svg>")}.wrap{max-width:860px;margin:0 auto;padding:0 16px}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,Arial,sans-serif;text-align:center}h1{margin:20px 0 10px;font-size:26px;font-weight:800;background:linear-gradient(90deg,var(--b),var(--a));-webkit-background-clip:text;background-clip:text;color:transparent}.frame{width:min(680px,92vw);margin:18px auto 8px;padding:16px;border-radius:26px;background:linear-gradient(#111,#111) padding-box,conic-gradient(from 120deg,var(--a),var(--b),var(--a)) border-box;border:3px solid transparent;box-shadow:0 16px 36px rgba(0,0,0,.45),0 0 40px rgba(255,119,169,.12);position:relative;overflow:hidden}.viewport{position:relative;width:100%;aspect-ratio:4/5;border-radius:18px;overflow:hidden;background:radial-gradient(120% 100% at 50% 0,#171626 0%,#0f0e18 60%)}.slide{position:absolute;inset:0;opacity:0;transition:opacity .5s ease}.slide.show{opacity:1}.slide img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1.07) contrast(1.03)}.slide.enter img{-webkit-mask-image:var(--heart-url);mask-image:var(--heart-url);-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center;-webkit-mask-size:0% 0%;mask-size:0% 0%;animation:heartOpen 1100ms ease forwards}@keyframes heartOpen{0%{-webkit-mask-size:0% 0%;mask-size:0% 0%;opacity:.6}65%{-webkit-mask-size:140% 140%;mask-size:140% 140%}100%{-webkit-mask-size:200% 200%;mask-size:200% 200%;opacity:1}}.section{padding:18px 14px;text-align:left;max-width:min(720px,92vw);margin:0 auto}.section h3{margin:8px 0 10px;font-size:19px}.section p{margin:0;color:var(--muted);line-height:1.7}.ytbox iframe{width:100%;height:230px;border:0;border-radius:14px;box-shadow:0 12px 26px rgba(0,0,0,.45)}#hearts{position:fixed;inset:0;z-index:999;pointer-events:auto}.heart{position:fixed;top:-10vh;font-size:var(--sz,18px);cursor:pointer;transform:translateY(-10vh) rotate(0);filter:drop-shadow(0 8px 12px rgba(255,77,109,.25));animation:fall var(--du,9s) linear forwards,sway var(--du,9s) ease-in-out infinite;opacity:.95}@keyframes fall{to{transform:translateY(110vh) rotate(360deg);opacity:0}}@keyframes sway{0%,100%{margin-left:-10px}50%{margin-left:10px}}.boom{position:fixed;left:0;top:0;width:0;height:0;pointer-events:none;z-index:1000}.spark{position:absolute;opacity:0;font-size:var(--sz,16px);transform:translate(0,0) scale(.6) rotate(0);animation:spark 700ms ease-out forwards}@keyframes spark{0%{opacity:0;transform:translate(0,0) scale(.6) rotate(0)}20%{opacity:1}100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(1.2) rotate(var(--rot))}}.ring{position:absolute;width:8px;height:8px;border:2px solid rgba(255,119,169,.85);border-radius:999px;opacity:0;animation:ring 600ms ease-out forwards}@keyframes ring{0%{opacity:.9;transform:scale(.2)}100%{opacity:0;transform:scale(6)}}</style></head><body><div id='hearts'></div><h1>${esc(state.title||'Nosso Amor')}</h1><div class='frame'><div class='viewport' id='vp'>${slides}</div></div><div class='section'><h3>Nossa mensagem:</h3><p>${esc(state.msg||'')}</p></div><div class='section'><h3>Nossa Música:</h3><div class='ytbox'><iframe src='https://www.youtube.com/embed/${id}?autoplay=1&mute=1&playsinline=1&loop=1&playlist=${id}' allow='autoplay; encrypted-media' allowfullscreen></iframe></div></div><script>const slides=[...document.querySelectorAll('.slide')];let i=0;setInterval(()=>{if(slides.length<2)return;const cur=slides[i];i=(i+1)%slides.length;const nxt=slides[i];cur.classList.remove('show');nxt.classList.add('show','enter');setTimeout(()=>nxt.classList.remove('enter'),1200);},5200);const heartsLayer=document.getElementById('hearts');function spawnHeart(){const e=document.createElement('span');e.className='heart';e.textContent=Math.random()<.5?'💖':'💘';e.style.setProperty('--sz',(14+Math.random()*18)+'px');e.style.setProperty('--du',(7+Math.random()*6)+'s');e.style.left=(Math.random()*100)+'vw';e.style.opacity=0.75+Math.random()*0.25;e.addEventListener('click',(ev)=>{explode(ev.clientX,ev.clientY);e.remove();});heartsLayer.appendChild(e);setTimeout(()=>e.remove(),14000);}function explode(x,y){const boom=document.createElement('div');boom.className='boom';boom.style.left=x+'px';boom.style.top=y+'px';const ring=document.createElement('div');ring.className='ring';boom.appendChild(ring);const n=12;for(let k=0;k<n;k++){const s=document.createElement('span');s.className='spark';s.textContent=Math.random()<.6?'💖':'💘';const ang=Math.random()*Math.PI*2;const dist=50+Math.random()*80;s.style.setProperty('--tx',Math.cos(ang)*dist+'px');s.style.setProperty('--ty',Math.sin(ang)*dist+'px');s.style.setProperty('--rot',(Math.random()*720-360)+'deg');s.style.setProperty('--sz',(12+Math.random()*10)+'px');boom.appendChild(s);}document.body.appendChild(boom);setTimeout(()=>boom.remove(),800);}setInterval(spawnHeart,260);<\/script></body></html>`;
-    }
+    // Google Config
+    const gApiKey=$('#gApiKey'),gClientId=$('#gClientId'),sheetId=$('#sheetId');
+    function saveCfg(){localStorage.setItem('GA_API_KEY',gApiKey.value);localStorage.setItem('GA_CLIENT_ID',gClientId.value);localStorage.setItem('GA_SHEET_ID',sheetId.value);log('Configuração salva');}
+    $('#btnSaveCfg').onclick=saveCfg;
 
-    // ====== Baixar HTML
-    $('#btnDownload').addEventListener('click',()=>{ const html=generateSiteHTML(); const blob=new Blob([html],{type:'text/html'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='mini-site-amor.html'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); });
-
-    // ====== Google APIs (Drive + Sheets) ======
-    const DISCOVERY_DOCS=[
-      'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest',
-      'https://sheets.googleapis.com/$discovery/rest?version=v4'
-    ];
-    const SCOPES='https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets';
-
-    function loadCfg(){ gApiKey.value=localStorage.getItem('GA_API_KEY')||''; gClientId.value=localStorage.getItem('GA_CLIENT_ID')||''; sheetId.value=localStorage.getItem('GA_SHEET_ID')||''; }
-    function saveCfg(){ localStorage.setItem('GA_API_KEY', gApiKey.value.trim()); localStorage.setItem('GA_CLIENT_ID', gClientId.value.trim()); localStorage.setItem('GA_SHEET_ID', sheetId.value.trim()); log('✅ Configuração salva localmente.'); }
-    const gApiKey=$('#gApiKey'), gClientId=$('#gClientId'), sheetId=$('#sheetId'); loadCfg();
-    $('#btnSaveCfg').addEventListener('click', saveCfg);
-
-    async function initClient(){
-      const apiKey=gApiKey.value.trim(), clientId=gClientId.value.trim();
-      if(!apiKey||!clientId){ log('⚠️ Informe API Key e Client ID em "Configuração do Google".'); throw new Error('missing cfg'); }
-      await new Promise(res=>gapi.load('client:auth2',res));
-      await gapi.client.init({ apiKey, clientId, discoveryDocs:DISCOVERY_DOCS, scope:SCOPES });
-      $('#btnSign').disabled=false; $('#btnSaveAll').disabled=false; log('🔗 Google API pronto. Clique em "Entrar com Google".');
-    }
-
-    async function signIn(){ try{ await initClient(); if(!gapi.auth2.getAuthInstance().isSignedIn.get()){ await gapi.auth2.getAuthInstance().signIn(); } log('✅ Logado no Google.'); } catch(e){ log('Erro no login: '+e.message); }}
-    $('#btnSign').addEventListener('click', signIn);
-
-    // Upload helper (multipart)
-    async function driveCreateFolder(name){ const res = await gapi.client.drive.files.create({ resource:{ name, mimeType:'application/vnd.google-apps.folder' }, fields:'id, webViewLink' }); return res.result; }
-    async function driveShareAnyone(fileId){ try{ await gapi.client.drive.permissions.create({ fileId, resource:{ role:'reader', type:'anyone' } }); }catch(e){ /* ignore if already shared */ } }
-
-    async function driveUploadBase64(folderId, filename, mimeType, dataURL){
-      const base64 = dataURL.split(',')[1];
-      const metadata = { name: filename, parents:[folderId] };
-      const boundary='-------314159265358979323846';
-      const delimiter='\r\n--'+boundary+'\r\n';
-      const close='\r\n--'+boundary+'--';
-      const body = delimiter + 'Content-Type: application/json; charset=UTF-8\r\n\r\n' + JSON.stringify(metadata) + delimiter + 'Content-Type: '+mimeType+'\r\n' + 'Content-Transfer-Encoding: base64\r\n\r\n' + base64 + close;
-      const res = await gapi.client.request({ path:'/upload/drive/v3/files', method:'POST', params:{ uploadType:'multipart' }, headers:{ 'Content-Type':'multipart/related; boundary='+boundary }, body });
-      return res.result; // id, name
-    }
-
-    async function appendToSheet(values){ const sid=sheetId.value.trim(); if(!sid){ log('⚠️ Informe o ID da Planilha.'); return; } await gapi.client.sheets.spreadsheets.values.append({ spreadsheetId:sid, range:'A:Z', valueInputOption:'USER_ENTERED', resource:{ values:[values] } }); }
-
-    function nowStamp(){ const d=new Date(); const pad=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`; }
-
-    $('#btnSaveAll').addEventListener('click', async ()=>{
-      try{
-        await signIn();
-        if(state.photos.length===0){ log('⚠️ Adicione pelo menos 1 foto antes de salvar.'); return; }
-        const folderName = `MiniSite Amor - ${(state.title||'Sem Título')}`;
-        log('📁 Criando pasta no Drive...');
-        const folder = await driveCreateFolder(folderName);
-        await driveShareAnyone(folder.id);
-        log('✅ Pasta criada: '+folder.webViewLink);
-
-        const uploadedLinks=[];
-        for(let i=0;i<state.photos.length;i++){
-          const p=state.photos[i];
-          log(`⬆️ Enviando foto ${i+1}/${state.photos.length}...`);
-          const file = await driveUploadBase64(folder.id, p.name||`foto${i+1}.jpg`, p.type||'image/jpeg', p.dataURL);
-          await driveShareAnyone(file.id);
-          uploadedLinks.push(`https://drive.google.com/file/d/${file.id}/view`);
-        }
-
-        // subir o HTML final também
-        const html=generateSiteHTML();
-        log('⬆️ Enviando página HTML...');
-        const htmlFile = await driveUploadBase64(folder.id, 'mini-site-amor.html', 'text/html', 'data:text/html;base64,'+btoa(unescape(encodeURIComponent(html))));
-        await driveShareAnyone(htmlFile.id);
-        const htmlLink = `https://drive.google.com/file/d/${htmlFile.id}/view`;
-
-        // Salvar linha na planilha
-        log('📝 Gravando configurações na planilha...');
-        await appendToSheet([
-          nowStamp(), state.title||'', state.msg||'', state.yt||'', `https://drive.google.com/drive/folders/${folder.id}`, htmlLink, ...uploadedLinks
-        ]);
-        log('🎉 Tudo salvo! Links:\n• Pasta: https://drive.google.com/drive/folders/'+folder.id+'\n• HTML: '+htmlLink);
-      }catch(e){ log('❌ Erro: '+(e.result?.error?.message||e.message)); }
-    });
-
-    function log(msg){ logEl.textContent = msg; }
-
-    // ====== Corações caindo + explosão ======
-    const heartsLayer=document.getElementById('hearts');
-    function spawnHeart(){ const e=document.createElement('span'); e.className='heart'; e.textContent=Math.random()<.5?'💖':'💘'; e.style.setProperty('--sz',(14+Math.random()*18)+'px'); e.style.setProperty('--du',(7+Math.random()*6)+'s'); e.style.left=(Math.random()*100)+'vw'; e.style.opacity=0.75+Math.random()*0.25; e.addEventListener('click',(ev)=>{ explode(ev.clientX,ev.clientY); e.remove(); }); heartsLayer.appendChild(e); setTimeout(()=>e.remove(),14000); }
-    function explode(x,y){ const boom=document.createElement('div'); boom.className='boom'; boom.style.left=x+'px'; boom.style.top=y+'px'; const ring=document.createElement('div'); ring.className='ring'; boom.appendChild(ring); const n=12; for(let k=0;k<n;k++){ const s=document.createElement('span'); s.className='spark'; s.textContent=Math.random()<.6?'💖':'💘'; const ang=Math.random()*Math.PI*2; const dist=50+Math.random()*80; s.style.setProperty('--tx',Math.cos(ang)*dist+'px'); s.style.setProperty('--ty',Math.sin(ang)*dist+'px'); s.style.setProperty('--rot',(Math.random()*720-360)+'deg'); s.style.setProperty('--sz',(12+Math.random()*10)+'px'); boom.appendChild(s);} document.body.appendChild(boom); setTimeout(()=>boom.remove(),800); }
-    setInterval(spawnHeart,260);
-
-    // inicial
-    titleEl.textContent='Seu título aqui';
-  <\/script></body></html>
+    // Hearts
+    const hearts=$('#hearts');
+    function spawn(){const e=document.createElement('span');e.className='heart';e.textContent=Math.random()<.5?'💖':'💘';e.style.left=Math.random()*100+'vw';e.onclick=ev=>explode(ev.clientX,ev.clientY);hearts.appendChild(e);setTimeout(()=>e.remove(),9000);}
+    function explode(x,y){const b=document.createElement('div');b.className='boom';b.style.left=x+'px';b.style.top=y+'px';const r=document.createElement('div');r.className='ring';b.appendChild(r);for(let i=0;i<12;i++){const s=document.createElement('span');s.className='spark';s.textContent='💖';s.style.setProperty('--tx',Math.random()*100-50+'px');s.style.setProperty('--ty',Math.random()*100-50+'px');b.appendChild(s);}document.body.appendChild(b);setTimeout(()=>b.remove(),800);}
+    setInterval(spawn,300);
+  </script>
+</body>
+</html>
