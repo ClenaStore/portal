@@ -128,14 +128,14 @@ $('#titleInput').oninput=e=>{state.title=e.target.value;$('#title').textContent=
 $('#dateInput').onchange=e=>{state.date=e.target.value;$('#since').textContent=msSince(state.date);}
 $('#msgInput').oninput=e=>{state.msg=e.target.value;$('#msgOut').textContent=state.msg||"Sua mensagem aparecerá aqui.";}
 $('#ytInput').oninput=e=>{
-  state.yt=e.target.value;let id="";try{const u=new URL(state.yt);if(u.hostname.includes("youtu.be"))id=u.pathname.slice(1);else id=u.searchParams.get("v");}catch{}
+  state.yt=e.target.value;let id=getYoutubeId(state.yt);
   $('#ytFrame').src=id?`https://www.youtube.com/embed/${id}?autoplay=1&mute=1&loop=1&playlist=${id}`:"";
 };
 $('#filesInput').onchange=e=>{
   if(e.target.files.length>5){alert("Máximo 5 fotos!");return;}
-  state.photos=[];for(const f of e.target.files){
+  state.photos=[];[...e.target.files].forEach(f=>{
     const r=new FileReader();r.onload=()=>{state.photos.push({name:f.name,type:f.type,dataURL:r.result});drawSlides();drawThumbs();};r.readAsDataURL(f);
-  }
+  });
 };
 function drawThumbs(){
   const thumbs=$('#thumbs');thumbs.innerHTML="";
@@ -170,57 +170,25 @@ $('#btnConfirm').onclick=()=>{
   $('#popup').style.display="none";saveAll();
 };
 
-// Simula salvar + gera HTML final
+// Salvar via GAS
 async function saveAll(){
   if(state.photos.length==0){log("⚠️ Adicione pelo menos uma foto.");return;}
-  log("✅ Mini site gerado!");$('#btnDownload').style.display="inline-block";
-  const html=generateSiteHTML();const blob=new Blob([html],{type:"text/html"});state.htmlLink=URL.createObjectURL(blob);
+  log("⏳ Enviando...");
+  try{
+    const res=await fetch("URL_DO_SEU_WEBAPP_GAS",{
+      method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(state)
+    });
+    const data=await res.json();
+    if(data.success){
+      log("✅ Mini site salvo!");
+      $('#btnDownload').style.display="inline-block";
+      state.htmlLink=data.htmlLink;
+    } else { log("❌ Erro: "+data.error); }
+  }catch(err){ log("❌ Falha: "+err.message); }
 }
 $('#btnDownload').onclick=()=>{
   if(state.htmlLink){const a=document.createElement("a");a.href=state.htmlLink;a.download="mini-site.html";a.click();}
 };
-
-// Estrutura do mini site final
-function generateSiteHTML(){
-  const id=getYoutubeId(state.yt);
-  const slides=state.photos.map((p,i)=>`<div class="slide${i==0?" show":""}"><img src="${p.dataURL}"><div class="caption"><span>${esc(p.name)}</span></div></div>`).join("");
-  return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>${esc(state.title||"Nosso Amor")}</title>
-<style>
-body{margin:0;background:#0b0a13;color:#fff;font-family:Inter,system-ui,sans-serif;text-align:center;overflow-x:hidden}
-h1{background:linear-gradient(90deg,#9b87ff,#ff77a9);-webkit-background-clip:text;color:transparent;padding:20px 0;margin:0;font-size:24px}
-.viewport{width:90%;margin:0 auto;aspect-ratio:4/5;position:relative;overflow:hidden;border-radius:16px;background:#111}
-.slide{position:absolute;inset:0;opacity:0;transition:opacity .5s}
-.slide.show{opacity:1}
-.slide img{width:100%;height:100%;object-fit:cover;border:6px solid transparent;border-image:linear-gradient(135deg,#ff77a9,#9b87ff) 1;border-radius:16px}
-.caption{position:absolute;bottom:10px;left:0;right:0}
-.caption span{background:rgba(0,0,0,.6);color:#fff;padding:4px 8px;border-radius:6px;font-size:13px}
-#hearts{position:fixed;inset:0;pointer-events:none;z-index:1000}
-.heart{position:absolute;font-size:18px;animation:fall linear forwards;opacity:.9}
-@keyframes fall{to{transform:translateY(100vh);opacity:0}}
-</style></head><body>
-<div id="hearts"></div>
-<h1>${esc(state.title||"Nosso Amor")}</h1>
-<div class="viewport">${slides}</div>
-<p>${esc(state.msg||"")}</p>
-<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&mute=1&loop=1&playlist=${id}" style="width:90%;height:200px;border:0;border-radius:12px;margin-top:20px" allow="autoplay;encrypted-media" allowfullscreen></iframe>
-<script>
-setInterval(()=>{
- const slides=[...document.querySelectorAll('.slide')];if(slides.length<2)return;
- const cur=slides.find(el=>el.classList.contains('show'))||slides[0];let i=slides.indexOf(cur);cur.classList.remove('show');
- const nxt=slides[(i+1)%slides.length];nxt.classList.add('show');
- const img=nxt.querySelector('img');
- img.animate([{webkitMaskSize:"0% 0%",opacity:.6},{webkitMaskSize:"200% 200%",opacity:1}],{duration:1100,easing:"ease"});
-},5200);
-function spawnHeart(){
- const e=document.createElement("div");e.className="heart";e.textContent=Math.random()<.5?"💖":"💘";
- e.style.left=Math.random()*100+"vw";e.style.top="-10px";e.style.fontSize=(14+Math.random()*20)+"px";
- e.style.animationDuration=(4+Math.random()*4)+"s";document.getElementById("hearts").appendChild(e);
- setTimeout(()=>e.remove(),8000);
-}
-setInterval(spawnHeart,400);
-<\/script></body></html>`;
-}
 function log(m){$('#log').textContent=m;}
 </script>
 </body>
