@@ -133,7 +133,7 @@ async function saveAll(){
 
   log("⏳ Enviando dados...");
   try{
-    const res=await fetch("SEU_ENDPOINT_GAS_AQUI",{
+    const res=await fetch("https://script.google.com/macros/s/AKfycbzNPE2yw5SsqK4sBkp2rRcbto62473KWzosgA24Mr0jE-3C4c0a5nQPh47Y2pqKEHRv/exec",{
       method:"POST",headers:{"Content-Type":"application/json"},
       body:JSON.stringify(state)
     });
