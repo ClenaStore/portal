@@ -6,10 +6,8 @@
   <title>Painel • Mini Site do Amor</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --bg:#0c0a13;--ink:#fff;--mut:#cfcada;--line:#2b2a3f;--card:#181827;
-      --a:#ff77a9;--b:#9b87ff;--shadow:0 12px 30px rgba(0,0,0,.35),0 8px 24px rgba(155,135,255,.18);
-    }
+    :root{--bg:#0c0a13;--ink:#fff;--mut:#cfcada;--line:#2b2a3f;
+      --a:#ff77a9;--b:#9b87ff;--shadow:0 12px 30px rgba(0,0,0,.35),0 8px 24px rgba(155,135,255,.18);}
     *{box-sizing:border-box}
     body{margin:0;background:#0b0a13;color:var(--ink);font-family:Inter,system-ui,sans-serif}
     .wrap{max-width:1180px;margin:0 auto;padding:0 20px}
@@ -39,21 +37,11 @@
     .viewport{width:100%;aspect-ratio:4/5;border-radius:16px;overflow:hidden;background:#111;position:relative}
     .slide{position:absolute;inset:0;opacity:0;transition:opacity .5s}
     .slide.show{opacity:1}
-    .slide img{
-      width:100%;height:100%;object-fit:cover;
-      border:6px solid transparent;
-      border-image:linear-gradient(135deg,var(--a),var(--b)) 1;
-      border-radius:16px;
-      -webkit-mask-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path fill='white' d='M50 86 L16 52 A20 20 0 1 1 50 28 A20 20 0 1 1 84 52 Z'/></svg>");
-      -webkit-mask-repeat:no-repeat;-webkit-mask-position:center;-webkit-mask-size:0% 0%;
-      mask-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path fill='white' d='M50 86 L16 52 A20 20 0 1 1 50 28 A20 20 0 1 1 84 52 Z'/></svg>");
-      mask-repeat:no-repeat;mask-position:center;mask-size:0% 0%;
-    }
+    .slide img{width:100%;height:100%;object-fit:cover;border:6px solid transparent;
+      border-image:linear-gradient(135deg,var(--a),var(--b)) 1;border-radius:16px}
     .caption{position:absolute;bottom:10px;left:0;right:0;text-align:center}
     .caption span{background:rgba(0,0,0,.6);padding:4px 8px;border-radius:6px;font-size:12px}
     .since{text-align:center;margin:6px 0;font-size:12px;color:#ccc}
-
-    /* Miniaturas */
     .thumbs{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
     .thumb{position:relative}
     .thumb img{width:60px;height:60px;object-fit:cover;border-radius:8px;border:2px solid var(--a)}
@@ -129,7 +117,7 @@
 const $=s=>document.querySelector(s);
 const state={nome:"",email:"",whats:"",title:"",date:"",msg:"",yt:"",photos:[]};
 
-function esc(s){return String(s??'').replace(/[&<>]/g,m=>({"&":"&amp;","<":"&lt;","">":"&gt;"}[m]));}
+function esc(s){return String(s??'').replace(/[&<>]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[m]));}
 function msSince(d){if(!d)return"";const dd=new Date(d),now=new Date();const days=Math.floor((now-dd)/86400000);return `Juntos há: ${days} dias`;}
 
 // Preview
@@ -150,6 +138,18 @@ $('#filesInput').onchange=e=>{
     r.readAsDataURL(f);
   }
 };
+function drawThumbs(){
+  const thumbs=$('#thumbs'); thumbs.innerHTML="";
+  state.photos.forEach((p,i)=>{
+    const t=document.createElement("div"); t.className="thumb";
+    t.innerHTML=`<img src="${p.dataURL}"><button>✕</button>`;
+    t.querySelector("button").onclick=()=>{
+      state.photos.splice(i,1);
+      drawSlides(); drawThumbs();
+    };
+    thumbs.appendChild(t);
+  });
+}
 function drawSlides(){
   const vp=$('#viewport');vp.innerHTML="";
   state.photos.forEach((p,i)=>{
@@ -159,31 +159,27 @@ function drawSlides(){
     vp.appendChild(s);
   });
 }
-function drawThumbs(){
-  const thumbs=$('#thumbs');thumbs.innerHTML="";
-  state.photos.forEach((p,i)=>{
-    const t=document.createElement("div");t.className="thumb";
-    t.innerHTML=`<img src="${p.dataURL}"><button>✕</button>`;
-    t.querySelector("button").onclick=()=>{state.photos.splice(i,1);drawSlides();drawThumbs();};
-    thumbs.appendChild(t);
-  });
-}
 
-// Slideshow coração
+// Slide com coração
 setInterval(()=>{
-  const slides=[...document.querySelectorAll('.slide')];if(slides.length<2)return;
+  const slides=[...document.querySelectorAll('.slide')];
+  if(slides.length<2) return;
   const cur=slides.find(el=>el.classList.contains('show'))||slides[0];
   let i=slides.indexOf(cur);cur.classList.remove('show');
   const nxt=slides[(i+1)%slides.length];nxt.classList.add('show');
   const img=nxt.querySelector('img');
+  img.style.webkitMaskImage=img.style.maskImage="url('data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 100 100\\'><path fill=\\'white\\' d=\\'M50 86 L16 52 A20 20 0 1 1 50 28 A20 20 0 1 1 84 52 Z\\'/></svg>')";
+  img.style.webkitMaskRepeat=img.style.maskRepeat="no-repeat";
+  img.style.webkitMaskPosition=img.style.maskPosition="center";
+  img.style.webkitMaskSize=img.style.maskSize="0% 0%";
   img.animate([
-    {webkitMaskSize:'0% 0%',maskSize:'0% 0%',opacity:.6},
-    {webkitMaskSize:'140% 140%',maskSize:'140% 140%'},
-    {webkitMaskSize:'200% 200%',maskSize:'200% 200%',opacity:1}
-  ],{duration:1100,easing:'ease'});
+    {webkitMaskSize:"0% 0%",maskSize:"0% 0%",opacity:.6},
+    {webkitMaskSize:"140% 140%",maskSize:"140% 140%"},
+    {webkitMaskSize:"200% 200%",maskSize:"200% 200%",opacity:1}
+  ],{duration:1100,easing:"ease"});
 },5200);
 
-// === Popup ===
+// Popup
 $('#btnSaveAll').onclick=()=>$('#popup').style.display="flex";
 $('#btnCancel').onclick=()=>$('#popup').style.display="none";
 $('#btnConfirm').onclick=()=>{
@@ -191,11 +187,10 @@ $('#btnConfirm').onclick=()=>{
   state.email=$('#emailInput').value.trim();
   state.whats=$('#whatsInput').value.trim();
   if(!state.nome||!state.email||!state.whats){alert("Preencha todos os campos");return;}
-  $('#popup').style.display="none";
-  saveAll();
+  $('#popup').style.display="none";saveAll();
 };
 
-// ====== Salvar ======
+// Salvar
 async function saveAll(){
   if(state.photos.length==0){log("⚠️ Adicione pelo menos uma foto.");return;}
   log("⏳ Enviando dados...");
@@ -216,7 +211,6 @@ $('#btnDownload').onclick=()=>{
   if(state.htmlLink) window.open(state.htmlLink,"_blank");
   else alert("Salve primeiro para gerar o link do HTML");
 };
-
 function log(m){$('#log').textContent=m;}
 </script>
 </body>
