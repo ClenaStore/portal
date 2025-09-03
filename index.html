@@ -41,6 +41,14 @@
     .caption{position:absolute;bottom:10px;left:0;right:0;text-align:center}
     .caption span{background:rgba(0,0,0,.6);padding:4px 8px;border-radius:6px;font-size:12px}
     .since{text-align:center;margin:6px 0;font-size:12px;color:#ccc}
+
+    /* ==== Popup ==== */
+    .popup{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:1000}
+    .popup .box{background:#1a1a2a;padding:20px;border-radius:16px;max-width:360px;width:90%}
+    .popup h2{margin:0 0 12px;font-size:18px}
+    .popup label{display:block;margin-top:10px;font-size:13px}
+    .popup input{width:100%;margin-top:4px}
+    .popup .actions{justify-content:flex-end;margin-top:14px}
   </style>
 </head>
 <body>
@@ -59,9 +67,6 @@
     <div class="panel">
       <header>Configurações</header>
       <div class="bd rows">
-        <label>Nome completo</label><input id="nomeInput" type="text">
-        <label>Email</label><input id="emailInput" type="text">
-        <label>WhatsApp</label><input id="whatsInput" type="text" placeholder="(99) 99999-9999">
         <label>Título</label><input id="titleInput" type="text" placeholder="Patrícia e Sérgio">
         <label>Data especial</label><input id="dateInput" type="date">
         <label>Mensagem</label><textarea id="msgInput"></textarea>
@@ -88,6 +93,20 @@
   </div>
 </main>
 
+<!-- Popup -->
+<div class="popup" id="popup">
+  <div class="box">
+    <h2>Seus dados</h2>
+    <label>Nome completo</label><input id="nomeInput" type="text">
+    <label>Email</label><input id="emailInput" type="text">
+    <label>WhatsApp</label><input id="whatsInput" type="text" placeholder="(99) 99999-9999">
+    <div class="actions">
+      <button class="btn" id="btnCancel">Cancelar</button>
+      <button class="btn btn-primary" id="btnConfirm">Confirmar</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const $=s=>document.querySelector(s);
 const state={nome:"",email:"",whats:"",title:"",date:"",msg:"",yt:"",photos:[]};
@@ -95,10 +114,7 @@ const state={nome:"",email:"",whats:"",title:"",date:"",msg:"",yt:"",photos:[]};
 function esc(s){return String(s??'').replace(/[&<>]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[m]));}
 function msSince(d){if(!d)return"";const dd=new Date(d),now=new Date();const days=Math.floor((now-dd)/86400000);return `Juntos há: ${days} dias`;}
 
-// Inputs
-$('#nomeInput').oninput=e=>state.nome=e.target.value;
-$('#emailInput').oninput=e=>state.email=e.target.value;
-$('#whatsInput').oninput=e=>state.whats=e.target.value;
+// Preview
 $('#titleInput').oninput=e=>{state.title=e.target.value;$('#title').textContent=state.title||"Seu título aqui";}
 $('#dateInput').onchange=e=>{state.date=e.target.value;$('#since').textContent=msSince(state.date);}
 $('#msgInput').oninput=e=>{state.msg=e.target.value;$('#msgOut').textContent=state.msg||"Sua mensagem aparecerá aqui.";}
@@ -107,12 +123,10 @@ $('#ytInput').oninput=e=>{
   try{const u=new URL(state.yt);if(u.hostname.includes("youtu.be"))id=u.pathname.slice(1);else id=u.searchParams.get("v");}catch{}
   $('#ytFrame').src=id?`https://www.youtube.com/embed/${id}?autoplay=1&mute=1&loop=1&playlist=${id}`:"";
 };
-
-// Fotos
-$('#filesInput').onchange=async e=>{
+$('#filesInput').onchange=e=>{
   for(const f of e.target.files){
     const r=new FileReader();
-    r.onload=()=>{state.photos.push({name:f.name,dataURL:r.result});drawSlides();};
+    r.onload=()=>{state.photos.push({name:f.name,type:f.type,dataURL:r.result});drawSlides();};
     r.readAsDataURL(f);
   }
 };
@@ -126,14 +140,24 @@ function drawSlides(){
   });
 }
 
+// === Popup ===
+$('#btnSaveAll').onclick=()=>$('#popup').style.display="flex";
+$('#btnCancel').onclick=()=>$('#popup').style.display="none";
+$('#btnConfirm').onclick=()=>{
+  state.nome=$('#nomeInput').value.trim();
+  state.email=$('#emailInput').value.trim();
+  state.whats=$('#whatsInput').value.trim();
+  if(!state.nome||!state.email||!state.whats){alert("Preencha todos os campos");return;}
+  $('#popup').style.display="none";
+  saveAll();
+};
+
 // ====== Salvar ======
 async function saveAll(){
-  if(!state.nome||!state.email||!state.whats){log("⚠️ Preencha nome, email e WhatsApp.");return;}
   if(state.photos.length==0){log("⚠️ Adicione pelo menos uma foto.");return;}
-
   log("⏳ Enviando dados...");
   try{
-    const res=await fetch("https://script.google.com/macros/s/AKfycbzNPE2yw5SsqK4sBkp2rRcbto62473KWzosgA24Mr0jE-3C4c0a5nQPh47Y2pqKEHRv/exec",{
+    const res=await fetch("SEU_ENDPOINT_GAS_AQUI",{
       method:"POST",headers:{"Content-Type":"application/json"},
       body:JSON.stringify(state)
     });
@@ -141,31 +165,14 @@ async function saveAll(){
     if(data.success){
       log("✅ Salvo com sucesso!");
       $('#btnDownload').style.display="inline-block";
-      // guarda link HTML se o GAS devolver
       state.htmlLink=data.htmlLink;
-    }else{
-      log("❌ Erro: "+data.error);
-    }
+    }else log("❌ Erro: "+data.error);
   }catch(err){log("❌ Falha: "+err.message);}
 }
-$('#btnSaveAll').onclick=saveAll;
-
-// ====== Baixar HTML ======
 $('#btnDownload').onclick=()=>{
-  const html=generateSiteHTML();
-  const blob=new Blob([html],{type:'text/html'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='mini-site-amor.html';a.click();
+  if(state.htmlLink) window.open(state.htmlLink,"_blank");
+  else alert("Salve primeiro para gerar o link do HTML");
 };
-
-function generateSiteHTML(){
-  const slides=state.photos.map((p,i)=>`<div class="slide${i==0?" show":""}"><img src="${p.dataURL}"></div>`).join("");
-  const id=(()=>{
-    try{const u=new URL(state.yt);if(u.hostname.includes("youtu.be"))return u.pathname.slice(1);return u.searchParams.get("v");}catch{return"";}
-  })();
-  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(state.title)}</title></head>
-<body><h1>${esc(state.title)}</h1><div>${slides}</div><p>${esc(state.msg)}</p>
-<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&mute=1&loop=1&playlist=${id}" allow="autoplay;encrypted-media"></iframe></body></html>`;
-}
 
 function log(m){$('#log').textContent=m;}
 </script>
